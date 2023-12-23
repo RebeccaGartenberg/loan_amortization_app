@@ -25,7 +25,7 @@ def get_loan(db: Session, loan_id: int):
     return db.query(models.Loan).filter(models.Loan.id == loan_id).first()
 
 def get_user_loans(db: Session, user_id):
-    return db.query(models.Loan).filter(user_id == user_id).all()
+    return db.query(models.Loan).filter(models.Loan.user_id == user_id).all()
 
 
 def create_user_loan(db: Session, loan: schemas.LoanCreate, user_id: int):

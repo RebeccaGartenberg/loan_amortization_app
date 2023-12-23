@@ -33,3 +33,12 @@ def create_loan(loan: schemas.LoanCreate, user_id: int, db: Session = Depends(ge
     if not db_user:
         raise HTTPException(status_code=400, detail=f"User with id {user_id} does not exist")
     return repo.create_user_loan(db=db, loan=loan, user_id=user_id)
+
+
+@app.get("/users/{user_id}/loans")
+def get_user_loans(user_id: int, db: Session = Depends(get_db)):
+    # check if user has permissions to get loans for the user_id- either it's them, the loan was shared with them or they are a broker
+    db_user = repo.get_user(db, user_id=user_id)
+    if not db_user:
+        raise HTTPException(status_code=400, detail=f"User with id {user_id} does not exist")
+    return repo.get_user_loans(db, user_id=user_id)
