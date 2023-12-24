@@ -1,7 +1,7 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
-from . import repo, models, schemas
+from . import controller, repo, models, schemas
 from .database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
@@ -42,3 +42,23 @@ def get_user_loans(user_id: int, db: Session = Depends(get_db)):
     if not db_user:
         raise HTTPException(status_code=400, detail=f"User with id {user_id} does not exist")
     return repo.get_user_loans(db, user_id=user_id)
+
+@app.get("/users/{user_id}/loans/{loan_id}/schedule")
+def get_loan_schedule(user_id: int, loan_id: int, db: Session = Depends(get_db)):
+    # check if user has permissions to get loans for the user_id- either it's them, the loan was shared with them or they are a broker
+    db_user = repo.get_user(db, user_id=user_id)
+    if not db_user:
+        raise HTTPException(status_code=400, detail=f"User with id {user_id} does not exist")
+    # loan = repo.get_loan(db, loan_id)
+    return controller.get_loan_schedule(loan_id, db)
+    # return repo.get_user_loans(db, user_id=user_id)
+
+@app.get("/users/{user_id}/loans/{loan_id}/summary/{month_num}")
+def get_loan_summary(user_id: int, loan_id: int, month_num: int, db: Session = Depends(get_db)):
+    # check if user has permissions to get loans for the user_id- either it's them, the loan was shared with them or they are a broker
+    db_user = repo.get_user(db, user_id=user_id)
+    if not db_user:
+        raise HTTPException(status_code=400, detail=f"User with id {user_id} does not exist")
+    # loan = repo.get_loan(db, loan_id)
+    return controller.get_loan_summary(loan_id, month_num, db)
+    # return repo.get_user_loans(db, user_id=user_id)
