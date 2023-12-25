@@ -27,7 +27,7 @@ def generate_amortization_schedule(loan):
 
     return amortization_schedule
 
-def get_loan_schedule(loan_id, db):
+def get_loan_schedule(db, loan_id):
     loan = repo.get_loan(db, loan_id)
     amortization_schedule = generate_amortization_schedule(loan)
     return amortization_schedule[['Month', 'Remaining balance', 'Monthly payment']].to_dict(orient='records')
@@ -48,6 +48,11 @@ def get_loan_summary(loan_id, month_num, db):
                     }
 
     return loan_summary
+
+def get_user_loans(db, user_id):
+    user_loans = repo.get_user_loans(db, user_id)
+    shared_loans = repo.get_loans_shared_with_user(db, user_id)
+    return user_loans + shared_loans
 
 def share_loan(db, loan_id, user_email):
     new_viewer = repo.get_user_by_email(db, user_email)

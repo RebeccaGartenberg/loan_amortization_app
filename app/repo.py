@@ -27,6 +27,12 @@ def get_loan(db: Session, loan_id: int):
 def get_user_loans(db: Session, user_id):
     return db.query(models.Loan).filter(models.Loan.user_id == user_id).all()
 
+def get_loans_shared_with_user(db: Session, user_id):
+    return db.query(models.Loan).join(models.LoanViewer).filter(models.LoanViewer.user_id == user_id).all()
+
+def get_loan_viewer(db: Session, loan_id, user_id):
+    return db.query(models.LoanViewer).filter(models.LoanViewer.loan_id == loan_id, models.LoanViewer.user_id == user_id).first()
+
 def create_user_loan(db: Session, loan: schemas.LoanCreate, user_id: int):
     db_loan = models.Loan(**loan.dict(), user_id=user_id)
     db.add(db_loan)
