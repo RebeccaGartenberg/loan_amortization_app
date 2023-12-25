@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from . import repo
 import pandas as pd
 
@@ -47,3 +48,10 @@ def get_loan_summary(loan_id, month_num, db):
                     }
 
     return loan_summary
+
+def share_loan(db, loan_id, user_email):
+    new_viewer = repo.get_user_by_email(db, user_email)
+    if new_viewer is None:
+        raise HTTPException(status_code=400, detail=f"User with email {user_email} does not exist")
+        # invite this user to app?
+    return repo.create_loan_viewer(db, loan_id, new_viewer.id)

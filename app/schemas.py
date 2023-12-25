@@ -39,3 +39,18 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
+
+class LoanViewerBase(BaseModel):
+    pass
+
+class LoanViewerCreate(LoanViewerBase):
+    user_email: str
+
+
+class LoanViewer(LoanViewerBase):
+    id: int
+    loan_id: int
+    user_id: int
+
+    class Config:
+        orm_mode = True

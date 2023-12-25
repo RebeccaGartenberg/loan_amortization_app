@@ -27,3 +27,10 @@ class Loan(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
 
     user = relationship("User", back_populates="loans")
+
+class LoanViewer(Base):
+    __tablename__ = "loan_viewers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    loan_id = Column(Integer, ForeignKey("loans.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))

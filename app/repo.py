@@ -27,10 +27,16 @@ def get_loan(db: Session, loan_id: int):
 def get_user_loans(db: Session, user_id):
     return db.query(models.Loan).filter(models.Loan.user_id == user_id).all()
 
-
 def create_user_loan(db: Session, loan: schemas.LoanCreate, user_id: int):
     db_loan = models.Loan(**loan.dict(), user_id=user_id)
     db.add(db_loan)
     db.commit()
     db.refresh(db_loan)
     return db_loan
+
+def create_loan_viewer(db: Session, loan_id, user_id):
+    db_loan_viewer = models.LoanViewer(loan_id=loan_id, user_id=user_id)
+    db.add(db_loan_viewer)
+    db.commit()
+    db.refresh(db_loan_viewer)
+    return db_loan_viewer
