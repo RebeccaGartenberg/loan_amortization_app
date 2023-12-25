@@ -39,8 +39,8 @@ def create_loan(loan: schemas.LoanCreate, user_id: int, db: Session = Depends(ge
 
 @app.get("/users/{user_id}/loans")
 def get_user_loans(user_id: int, db: Session = Depends(get_database_session), current_user: HTTPBasicCredentials = Depends(AuthHandler().authenticate_user)):
-    # check if user has permissions to get loans for the user_id- either it's them, the loan was shared with them or they are a broker
     user = AuthHandler().check_existing_user(db, user_id)
+    # user can see their own loans and broker can see all loans
     if user.id == user_id or user.type == 'broker':
         return controller.get_user_loans(db, user_id)
     else:
@@ -48,26 +48,29 @@ def get_user_loans(user_id: int, db: Session = Depends(get_database_session), cu
 
 @app.get("/users/{user_id}/loans/{loan_id}/schedule")
 def get_loan_schedule(user_id: int, loan_id: int, db: Session = Depends(get_database_session), current_user: HTTPBasicCredentials = Depends(AuthHandler().authenticate_user)):
-    # check if user has permissions to get loans for the user_id- either it's them, the loan was shared with them or they are a broker
     user = AuthHandler().check_existing_user(db, user_id)
     loan = Validator().check_existing_loan(db, loan_id)
+    # user can see their own loans and loans shard with them, broker can see all loans
     loan_viewer = repo.get_loan_viewer(db, loan_id, user_id)
     if loan and (loan.user_id == user.id or loan_viewer or user.type == 'broker'):
         return controller.get_loan_schedule(db, loan_id)
 
 @app.get("/users/{user_id}/loans/{loan_id}/summary/{month_num}")
 def get_loan_summary(user_id: int, loan_id: int, month_num: int, db: Session = Depends(get_database_session), current_user: HTTPBasicCredentials = Depends(AuthHandler().authenticate_user)):
-    # check if user has permissions to get loans for the user_id- either it's them, the loan was shared with them or they are a broker
     user = AuthHandler().check_existing_user(db, user_id)
     loan = Validator().check_existing_loan(db, loan_id)
+    if month_num < 1 or month_num > loan.loan_term:
+        raise HTTPException(status_code=400, detail=f"Month number {month_num} is out of bounds")
+    # user can see their own loans and loans shard with them, broker can see all loans
     loan_viewer = repo.get_loan_viewer(db, loan_id, user_id)
     if loan and (loan.user_id == user.id or loan_viewer or user.type == 'broker'):
         return controller.get_loan_summary(loan_id, month_num, db)
 
 @app.post("/users/{user_id}/loans/{loan_id}/share", response_model=schemas.LoanViewer)
 def share_loan(loan_viewer: schemas.LoanViewerCreate, user_id: int, loan_id: int, db: Session = Depends(get_database_session), current_user: HTTPBasicCredentials = Depends(AuthHandler().authenticate_user)):
-    # check if user has permissions to get loans for the user_id- either it's them, the loan was shared with them (?) or they are a broker
     user = AuthHandler().check_existing_user(db, user_id)
     loan = Validator().check_existing_loan(db, loan_id)
-    if loan and (loan.user_id == user.id or user.type == 'broker'):
+    # only user can share their own loans
+    if loan and loan.user_id == user.id:
         return controller.share_loan(db, loan_id, loan_viewer.user_email)
+        

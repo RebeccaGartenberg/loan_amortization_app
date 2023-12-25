@@ -55,8 +55,11 @@ def get_user_loans(db, user_id):
     return user_loans + shared_loans
 
 def share_loan(db, loan_id, user_email):
-    new_viewer = repo.get_user_by_email(db, user_email)
-    if new_viewer is None:
+    user = repo.get_user_by_email(db, user_email)
+    if user is None:
         raise HTTPException(status_code=400, detail=f"User with email {user_email} does not exist")
         # invite this user to app?
+    loan_viewer = repo.get_loan_viewer(db, loan_id, user.id)
+    if loan_viewer:
+        raise HTTPException(status_code=400, detail=f"Loan already shared with user {loan_viewer.user_email}")
     return repo.create_loan_viewer(db, loan_id, new_viewer.id)
