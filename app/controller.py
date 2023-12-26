@@ -30,9 +30,8 @@ def generate_amortization_schedule(loan):
 def get_loan_schedule(db, loan_id):
     loan = repo.get_loan(db, loan_id)
     amortization_schedule = generate_amortization_schedule(loan)
-    # can view principal and interest payments separately by returning:
-    # amortization_schedule[['Month', 'Remaining balance', 'Principal', 'Interest']].to_dict(orient='records')
-    return amortization_schedule[['Month', 'Remaining balance', 'Monthly payment']].to_dict(orient='records')
+    # return principal payment, interest payment and total monthly payment (principal + interest):
+    return amortization_schedule[['Month', 'Remaining balance', 'Principal', 'Interest', 'Monthly payment']].to_dict(orient='records')
 
 def get_loan_summary(loan_id, month_num, db):
     loan = repo.get_loan(db, loan_id)
