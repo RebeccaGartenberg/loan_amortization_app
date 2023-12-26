@@ -23,13 +23,15 @@ def generate_amortization_schedule(loan):
         monthly_principal_payment = monthly_payment - monthly_interest_payment
         remaining_principal -= monthly_principal_payment
         amortization_schedule.loc[len(amortization_schedule)] = [month, round(monthly_principal_payment, 2), round(monthly_interest_payment, 2), round(remaining_principal, 2)]
-    amortization_schedule['Monthly payment'] = round(monthly_payment, 2)
+    amortization_schedule['Monthly payment'] = round(monthly_payment, 2) # same as summing principal and interest: round(amortization_schedule['Principal'] + amortization_schedule['Interest'], 2)
 
     return amortization_schedule
 
 def get_loan_schedule(db, loan_id):
     loan = repo.get_loan(db, loan_id)
     amortization_schedule = generate_amortization_schedule(loan)
+    # can view principal and interest payments separately by returning:
+    # amortization_schedule[['Month', 'Remaining balance', 'Principal', 'Interest']].to_dict(orient='records')
     return amortization_schedule[['Month', 'Remaining balance', 'Monthly payment']].to_dict(orient='records')
 
 def get_loan_summary(loan_id, month_num, db):
