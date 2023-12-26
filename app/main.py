@@ -33,7 +33,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_database_ses
 def create_loan(loan: schemas.LoanCreate, user_id: int, db: Session = Depends(get_database_session), current_user: HTTPBasicCredentials = Depends(AuthHandler().authenticate_user)):
     user = AuthHandler().check_existing_user(db, user_id)
     if user.id == user_id or user.type == 'broker':
-        return repo.create_user_loan(db=db, loan=loan, user_id=user_id)
+        return controller.create_user_loan(db=db, loan=loan, user_id=user_id)
     else:
         raise HTTPException(status_code=401, detail=f"User with id {user.id} and email {user.email} is not authorized to create new loan for user {user_id}")
 
@@ -73,4 +73,3 @@ def share_loan(loan_viewer: schemas.LoanViewerCreate, user_id: int, loan_id: int
     # only user can share their own loans
     if loan and loan.user_id == user.id:
         return controller.share_loan(db, loan_id, loan_viewer.user_email)
-        

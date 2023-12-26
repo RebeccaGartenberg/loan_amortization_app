@@ -49,6 +49,16 @@ def get_loan_summary(loan_id, month_num, db):
 
     return loan_summary
 
+def create_user_loan(db, loan, user_id):
+    # in reality there is likely a higher minimmum but for mathematical purposes 1 month is minimum term
+    if loan.loan_term < 1:
+        raise HTTPException(status_code=400, detail="Term length must be at least 1 month")
+    if loan.annual_interest_rate <= 0:
+        raise HTTPException(status_code=400, detail="Interest rate must be greater than 0%")
+    if loan.amount <= 0:
+        raise HTTPException(status_code=400, detail="Loan amount must be greater than $0")
+    return repo.create_user_loan(db=db, loan=loan, user_id=user_id)
+
 def get_user_loans(db, user_id):
     user_loans = repo.get_user_loans(db, user_id)
     shared_loans = repo.get_loans_shared_with_user(db, user_id)
@@ -62,4 +72,4 @@ def share_loan(db, loan_id, user_email):
     loan_viewer = repo.get_loan_viewer(db, loan_id, user.id)
     if loan_viewer:
         raise HTTPException(status_code=400, detail=f"Loan already shared with user {loan_viewer.user_email}")
-    return repo.create_loan_viewer(db, loan_id, new_viewer.id)
+    return repo.create_loan_viewer(db, loan_id, user.id)
