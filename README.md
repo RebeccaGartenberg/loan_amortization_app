@@ -74,9 +74,25 @@ A user that has type = 'broker' has access to create a loan for a user and view 
 
 Adding tests for the endpoints and methods is an important next step.
 Another step would be adding dates to the loan information rather than having month numbers from 1 to loan_term.
-For a larger project the functions related to similar entities or actions would be broken up into different files rather than have all endpoints stored in main.py and most functions in controller.py.
+For a larger project the functions related to similar entities or actions would be broken up into different files rather than having all endpoints stored in *main.py* and most functions in *controller.py*.
 
 **Sources**
 
 I used the amortization calculator [here](https://www.bankrate.com/mortgages/amortization-calculator/)
 and the explanation of the math [here](https://www.ramseysolutions.com/real-estate/amortization-schedule#:~:text=To%20calculate%20amortization%2C%20first%20multiply,toward%20principal%20for%20that%20month.) to learn how amortization calculations are done.
+
+**Commands**
+
+Run server:
+
+*uvicorn app.main:app --reload*
+
+Access sqlite db:
+
+*sqlite3 app.db*
+
+Upgrade and downgrade db:
+
+*alembic upgrade <revision>*
+
+*alembic downgrade <revision>*
