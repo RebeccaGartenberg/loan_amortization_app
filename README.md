@@ -60,6 +60,8 @@ Month 12:
 
 {"Current principal balance":-0.0,"Total principal paid":75000.01,"Total interest paid":1224.33}
 
+Loan summary for each month includes the current month. The balance and total paid values are after the payments for the given month.
+
 **Share loan:**
 
 curl -X POST -u <email>:<password> "http://localhost:8000/users/{user_id}/loans/{loan_id}/share" -H "Content-Type: application/json" -d '{
