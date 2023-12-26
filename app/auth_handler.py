@@ -22,3 +22,7 @@ class AuthHandler:
         if not user:
             raise HTTPException(status_code=404, detail=f"User with id {user_id} does not exist")
         return user
+
+    def check_user_page(self, current_user_id, user_id):
+        if current_user_id != user_id:
+            raise HTTPException(status_code=401, detail=f"User with id {current_user_id} cannot access page for user with id {user_id}")

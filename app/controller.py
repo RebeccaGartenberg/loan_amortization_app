@@ -34,6 +34,9 @@ def get_loan_schedule(db, loan_id):
 
 def get_loan_summary(loan_id, month_num, db):
     loan = repo.get_loan(db, loan_id)
+    if month_num < 1 or month_num > loan.loan_term:
+        raise HTTPException(status_code=400, detail=f"Month number {month_num} is out of bounds")
+
     amortization_schedule = generate_amortization_schedule(loan)
 
     # compute summary values including current month
@@ -62,14 +65,14 @@ def create_user_loan(db, loan, user_id):
 def get_user_loans(db, user_id):
     user_loans = repo.get_user_loans(db, user_id)
     shared_loans = repo.get_loans_shared_with_user(db, user_id)
-    return user_loans + shared_loans
+    return {"user's loans: ": user_loans, "loans shared with user: ": shared_loans}
 
 def share_loan(db, loan_id, user_email):
     user = repo.get_user_by_email(db, user_email)
     if user is None:
         raise HTTPException(status_code=400, detail=f"User with email {user_email} does not exist")
-        # invite this user to app?
+        # potentially invite this user to app
     loan_viewer = repo.get_loan_viewer(db, loan_id, user.id)
     if loan_viewer:
-        raise HTTPException(status_code=400, detail=f"Loan already shared with user {loan_viewer.user_email}")
+        raise HTTPException(status_code=400, detail=f"Loan {loan_id} already shared with user {user_email}")
     return repo.create_loan_viewer(db, loan_id, user.id)
